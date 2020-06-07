@@ -1,0 +1,23 @@
+{
+  "discounts": [
+    {
+      "description": "2 for 0.99",
+      "discountAmount": 1.1700000000000004,
+      "product": {
+        "name": "tomato",
+        "unit": 0
+      }
+    }
+  ],
+  "items": [
+    {
+      "price": 0.69,
+      "product": {
+        "name": "tomato",
+        "unit": 0
+      },
+      "quantity": 7,
+      "totalPrice": 4.83
+    }
+  ]
+}

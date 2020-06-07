@@ -1,0 +1,14 @@
+{
+  "discounts": [],
+  "items": [
+    {
+      "price": 0.69,
+      "product": {
+        "name": "tomato",
+        "unit": 0
+      },
+      "quantity": 1,
+      "totalPrice": 0.69
+    }
+  ]
+}

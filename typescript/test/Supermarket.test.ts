@@ -98,4 +98,38 @@ describe('Supermarket', function () {
             this.verifyAsJSON(receipt)
         });
     });
+
+    describe('TwoForAmount Discount', function () {
+        const tomato: Product = new Product("tomato", ProductUnit.Kilo);
+    
+        const catalog: SupermarketCatalog = new FakeCatalog();
+        catalog.addProduct(tomato, 0.69);
+    
+        const teller: Teller = new Teller(catalog);
+        teller.addSpecialOffer(SpecialOfferType.TwoForAmount, tomato, 0.99);
+
+        it('Buy 1 kilo of tomato', function (this: any) {
+            cart.addItemQuantity(tomato, 1);
+            const receipt: Receipt = teller.checksOutArticlesFrom(cart);
+            this.verifyAsJSON(receipt)
+        });
+
+        it('Buy 2 kilo of tomato', function (this: any) {
+            cart.addItemQuantity(tomato, 2);
+            const receipt: Receipt = teller.checksOutArticlesFrom(cart);
+            this.verifyAsJSON(receipt)
+        });
+
+        it('Buy 3 kilo of tomato', function (this: any) {
+            cart.addItemQuantity(tomato, 3);
+            const receipt: Receipt = teller.checksOutArticlesFrom(cart);
+            this.verifyAsJSON(receipt)
+        });
+
+        it('Buy 7 kilo of tomato', function (this: any) {
+            cart.addItemQuantity(tomato, 7);
+            const receipt: Receipt = teller.checksOutArticlesFrom(cart);
+            this.verifyAsJSON(receipt)
+        });
+    });
 });
