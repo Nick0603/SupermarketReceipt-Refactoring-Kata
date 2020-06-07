@@ -1,0 +1,23 @@
+{
+  "discounts": [
+    {
+      "description": "10% off",
+      "discountAmount": 0.747,
+      "product": {
+        "name": "rice",
+        "unit": 0
+      }
+    }
+  ],
+  "items": [
+    {
+      "price": 2.49,
+      "product": {
+        "name": "rice",
+        "unit": 0
+      },
+      "quantity": 3,
+      "totalPrice": 7.470000000000001
+    }
+  ]
+}
