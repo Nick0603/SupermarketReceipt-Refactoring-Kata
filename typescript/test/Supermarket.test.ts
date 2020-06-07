@@ -1,38 +1,45 @@
-import {FakeCatalog} from "./FakeCatalog"
-import {Product} from "../src/model/Product"
-import {SupermarketCatalog} from "../src/model/SupermarketCatalog"
-import {Receipt} from "../src/model/Receipt"
-import {ShoppingCart} from "../src/model/ShoppingCart"
-import {Teller} from "../src/model/Teller"
-import {SpecialOfferType} from "../src/model/SpecialOfferType"
-import {ProductUnit} from "../src/model/ProductUnit"
-const approvals = require('approvals')
+import { FakeCatalog } from "./FakeCatalog"
+import { Product } from "../src/model/Product"
+import { SupermarketCatalog } from "../src/model/SupermarketCatalog"
+import { Receipt } from "../src/model/Receipt"
+import { ShoppingCart } from "../src/model/ShoppingCart"
+import { Teller } from "../src/model/Teller"
+import { SpecialOfferType } from "../src/model/SpecialOfferType"
+import { ProductUnit } from "../src/model/ProductUnit"
+const approvals = require('approvals');
+approvals.mocha();
 
-type Approvals = {
-    verify: (s: string) => void
-    verifyAsJSON: (o: Object) => void
-}
+let cart: ShoppingCart;
+
+beforeEach(()=>{
+    cart = new ShoppingCart();
+})
 describe('Supermarket', function () {
-
-    approvals.mocha()
-    it('TODO decide what to specify', function (this: any) {
-
-        const catalog: SupermarketCatalog = new FakeCatalog();
+    describe('ThreeForTwo Discount', function () {
         const toothbrush: Product = new Product("toothbrush", ProductUnit.Each);
+    
+        const catalog: SupermarketCatalog = new FakeCatalog();
         catalog.addProduct(toothbrush, 0.99);
-        const apples: Product = new Product("apples", ProductUnit.Kilo);
-        catalog.addProduct(apples, 1.99);
-
-        const cart: ShoppingCart = new ShoppingCart();
-        cart.addItemQuantity(apples, 2.5);
-
+    
         const teller: Teller = new Teller(catalog);
-        teller.addSpecialOffer(SpecialOfferType.TenPercentDiscount, toothbrush, 10.0);
+        teller.addSpecialOffer(SpecialOfferType.ThreeForTwo, toothbrush, 0);
 
-        const receipt: Receipt = teller.checksOutArticlesFrom(cart);
+        it('Buy three toothbrushes to get free one', function (this: any) {
+            cart.addItemQuantity(toothbrush, 3);
+            const receipt: Receipt = teller.checksOutArticlesFrom(cart);
+            this.verifyAsJSON(receipt)
+        });
 
-        // Todo: complete this test
-        this.verifyAsJSON({})
+        it('Buy seven toothbrushes to get free two', function (this: any) {
+            cart.addItemQuantity(toothbrush, 7);
+            const receipt: Receipt = teller.checksOutArticlesFrom(cart);
+            this.verifyAsJSON(receipt)
+        });
+
+        it('Buy one toothbrush, no get any discount', function (this: any) {
+            cart.addItemQuantity(toothbrush, 1);
+            const receipt: Receipt = teller.checksOutArticlesFrom(cart);
+            this.verifyAsJSON(receipt)
+        });
     });
-
 });

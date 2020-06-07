@@ -1,0 +1,14 @@
+{
+  "discounts": [],
+  "items": [
+    {
+      "price": 0.99,
+      "product": {
+        "name": "toothbrush",
+        "unit": 1
+      },
+      "quantity": 1,
+      "totalPrice": 0.99
+    }
+  ]
+}
