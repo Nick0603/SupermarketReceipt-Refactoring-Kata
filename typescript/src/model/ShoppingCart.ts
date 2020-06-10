@@ -46,17 +46,19 @@ export class ShoppingCart {
     }
 
     handleOffers(receipt: Receipt, offers: OffersByProduct, catalog: SupermarketCatalog): void {
-        for (const productName in this.productQuantities()) {
-            const productQuantity = this._productQuantities[productName]
-            const product = productQuantity.product;
-            const quantity: number = this._productQuantities[productName].quantity;
-            if (offers[productName]) {
-                const offer: Offer = offers[productName];
-                const unitPrice: number = catalog.getUnitPrice(product);
-                let discount: Discount | null = this.calcDiscount(product, offer, unitPrice, quantity)
-                if (discount != null)
-                    receipt.addDiscount(discount);
+        const productQuantities = this.productQuantities();
+        for (const productName in productQuantities) {
+            const { product, quantity } = productQuantities[productName];
+            if (!offers[productName]) {
+                continue;
             }
+            const offer: Offer = offers[productName];
+            const unitPrice: number = catalog.getUnitPrice(product);
+            let discount: Discount | null = this.calcDiscount(product, offer, unitPrice, quantity)
+            if (discount === null) {
+                continue;
+            }
+            receipt.addDiscount(discount);
         }
     }
 
