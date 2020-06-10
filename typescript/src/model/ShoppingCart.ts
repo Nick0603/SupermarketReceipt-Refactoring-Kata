@@ -1,18 +1,18 @@
-import {Product} from "./Product"
-import {SupermarketCatalog} from "./SupermarketCatalog"
+import { Product } from "./Product"
+import { SupermarketCatalog } from "./SupermarketCatalog"
 import * as _ from "lodash"
-import {ProductQuantity} from "./ProductQuantity"
-import {Discount} from "./Discount"
-import {Receipt} from "./Receipt"
-import {Offer} from "./Offer"
-import {SpecialOfferType} from "./SpecialOfferType"
+import { ProductQuantity } from "./ProductQuantity"
+import { Discount } from "./Discount"
+import { Receipt } from "./Receipt"
+import { Offer } from "./Offer"
+import { SpecialOfferType } from "./SpecialOfferType"
 
 type ProductQuantities = { [productName: string]: ProductQuantity }
-export type OffersByProduct = {[productName: string]: Offer};
+export type OffersByProduct = { [productName: string]: Offer };
 
 export class ShoppingCart {
 
-    private readonly  items: ProductQuantity[] = [];
+    private readonly items: ProductQuantity[] = [];
     _productQuantities: ProductQuantities = {};
 
 
@@ -45,23 +45,23 @@ export class ShoppingCart {
         return new ProductQuantity(product, productQuantity.quantity + quantity)
     }
 
-    handleOffers(receipt: Receipt,  offers: OffersByProduct, catalog: SupermarketCatalog ):void {
+    handleOffers(receipt: Receipt, offers: OffersByProduct, catalog: SupermarketCatalog): void {
         for (const productName in this.productQuantities()) {
             const productQuantity = this._productQuantities[productName]
             const product = productQuantity.product;
             const quantity: number = this._productQuantities[productName].quantity;
             if (offers[productName]) {
-                const offer : Offer = offers[productName];
-                const unitPrice: number= catalog.getUnitPrice(product);
-                let discount : Discount|null = this.calcDiscount(product, offer, unitPrice, quantity)
+                const offer: Offer = offers[productName];
+                const unitPrice: number = catalog.getUnitPrice(product);
+                let discount: Discount | null = this.calcDiscount(product, offer, unitPrice, quantity)
                 if (discount != null)
                     receipt.addDiscount(discount);
             }
         }
     }
 
-    private calcDiscount(product: Product, offer: Offer, unitPrice: number, quantityAsInt: number): Discount|null {
-        let discount : Discount|null = null;
+    private calcDiscount(product: Product, offer: Offer, unitPrice: number, quantityAsInt: number): Discount | null {
+        let discount: Discount | null = null;
         let x = 1;
         if (offer.offerType == SpecialOfferType.ThreeForTwo) {
             x = 3;
