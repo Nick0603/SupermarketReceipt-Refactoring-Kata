@@ -10,6 +10,8 @@ import { SpecialOfferType } from "./SpecialOfferType"
 type ProductQuantities = { [productName: string]: ProductQuantity }
 export type OffersByProduct = { [productName: string]: Offer };
 
+type DiscountCalculator = {unitPrice: number, quantityAsInt: number, argument?: number}
+
 export class ShoppingCart {
 
     private readonly items: ProductQuantity[] = [];
@@ -63,25 +65,55 @@ export class ShoppingCart {
     }
 
     private calcDiscount(product: Product, offer: Offer, unitPrice: number, quantityAsInt: number): Discount | null {
-        let discount: Discount | null = null;
-        if (offer.offerType == SpecialOfferType.ThreeForTwo && quantityAsInt >= 3) {
-            const numberOfXs = Math.floor(quantityAsInt / 3);
-            const discountAmount = quantityAsInt * unitPrice - ((numberOfXs * 2 * unitPrice) + quantityAsInt % 3 * unitPrice);
-            discount = new Discount(product, "3 for 2", discountAmount);
+        let discountDescription = '';
+        let discountAmount = 0;
+        if (offer.offerType == SpecialOfferType.ThreeForTwo) {
+            discountDescription = "3 for 2";
+            discountAmount = this.calcDiscountByThreeForTwo({unitPrice, quantityAsInt});
         }
         if (offer.offerType == SpecialOfferType.TenPercentDiscount) {
-            discount = new Discount(product, offer.argument + "% off", quantityAsInt * unitPrice * offer.argument / 100.0);
+            discountDescription = offer.argument + "% off";
+            discountAmount = this.calcDiscountByTenPercentDiscount({unitPrice, quantityAsInt, argument: offer.argument});
         }
         if (offer.offerType == SpecialOfferType.TwoForAmount && quantityAsInt >= 2) {
-            const total = offer.argument * Math.floor(quantityAsInt / 2) + quantityAsInt % 2 * unitPrice;
-            const discountN = unitPrice * quantityAsInt - total;
-            discount = new Discount(product, "2 for " + offer.argument, discountN);
+            discountDescription = "2 for " + offer.argument;
+            discountAmount = this.calcDiscountByTwoForAmount({unitPrice, quantityAsInt, argument: offer.argument});
         }
         if (offer.offerType == SpecialOfferType.FiveForAmount && quantityAsInt >= 5) {
-            const numberOfXs = Math.floor(quantityAsInt / 5);
-            const discountTotal = unitPrice * quantityAsInt - (offer.argument * numberOfXs + quantityAsInt % 5 * unitPrice);
-            discount = new Discount(product, "5 for " + offer.argument, discountTotal);
+            discountDescription = "5 for " + offer.argument;
+            discountAmount = this.calcDiscountByFiveForAmount({unitPrice, quantityAsInt, argument: offer.argument});
         }
-        return discount;
+        if(discountAmount == 0){
+            return null
+        }
+        return new Discount(product, discountDescription, discountAmount);
     }
+
+    private calcDiscountByThreeForTwo({unitPrice, quantityAsInt}: DiscountCalculator): number {
+        if (quantityAsInt < 3) {
+            return 0;
+        }
+        const numberOfXs = Math.floor(quantityAsInt / 3);
+        const discountAmount = quantityAsInt * unitPrice - ((numberOfXs * 2 * unitPrice) + quantityAsInt % 3 * unitPrice);
+        return discountAmount;
+    }
+
+    private calcDiscountByTenPercentDiscount({unitPrice, quantityAsInt, argument: percentOff}: DiscountCalculator): number {
+        return quantityAsInt * unitPrice * Number(percentOff) / 100.0;
+    }
+
+    private calcDiscountByTwoForAmount({unitPrice, quantityAsInt, argument: appointedAmount}: DiscountCalculator): number {
+        const originTotal = unitPrice * quantityAsInt;
+        const realTotal = appointedAmount && appointedAmount * Math.floor(quantityAsInt / 2) + quantityAsInt % 2 * unitPrice;
+        const discountAmount = originTotal - Number(realTotal);
+        return discountAmount;
+    }
+
+    private calcDiscountByFiveForAmount({unitPrice, quantityAsInt, argument: appointedAmount}: DiscountCalculator): number {
+        const numberOfXs = Math.floor(quantityAsInt / 5);
+        const discountAmount = unitPrice * quantityAsInt - (Number(appointedAmount) * numberOfXs + quantityAsInt % 5 * unitPrice);
+        return discountAmount;
+    }
+
+
 }
